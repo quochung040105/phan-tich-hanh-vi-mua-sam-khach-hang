@@ -1,0 +1,158 @@
+[0] Kích thước ban đầu (file before): (2249, 29)
+Year_Birth NaN sau coerce: 6
+
+[0a] Số dòng trống hoàn toàn bị loại: 5
+Kích thước sau khi loại dòng trống: (2244, 29)
+
+[0b] Số dòng trùng lặp hoàn toàn bị loại: 4
+Kích thước sau khi loại dòng trùng: (2240, 29)
+
+[0c] Số dòng còn liên quan đến ID trùng (key issue) sau khi loại dup hoàn toàn: 2
+        ID  Year_Birth   Education Marital_Status   Income
+2   4141.0      1965.0  Graduation       Together  71613.0
+35  4141.0      1951.0      Master         Single  49389.0
+Kích thước sau khi xử lý ID trùng (giữ bản ghi đầy đủ hơn): (2239, 29)
+
+======================================================================
+(i) ĐIỀN GIÁ TRỊ CÒN THIẾU
+======================================================================
+
+-- Trường hợp 1: Income --
+Số giá trị NULL trước khi điền: 48
+Số giá trị NULL sau khi điền: 0
+Công thức: median(Income) theo nhóm (Education, Marital_Status), làm tròn đến hàng trăm; nếu nhóm không có dữ liệu thì dùng median toàn cục.
+
+-- Trường hợp 2: Year_Birth --
+Số giá trị NULL trước khi điền: 1; mode (thấp nhất nếu có nhiều mode) = 1976.0
+Số giá trị NULL sau khi điền: 0
+
+-- Trường hợp 3: Education --
+Số giá trị NULL trước khi điền: 25; sau khi điền: 0
+Công thức: mode(Education) theo nhóm Marital_Status; nếu nhóm rỗng dùng mode toàn cục.
+
+-- Trường hợp 4: Marital_Status --
+Số giá trị NULL trước khi điền: 25; sau khi điền: 0
+Công thức: mode(Marital_Status) theo nhóm Education.
+
+-- Trường hợp 5: Dt_Customer --
+Số giá trị NULL/không hợp lệ trước khi điền: 24; median ngày = 2013-07-09
+Số giá trị NULL sau khi điền: 0
+
+>>> Tổng số NaN còn lại sau bước (i): 0
+
+======================================================================
+(ii) LÀM MỊN DỮ LIỆU
+======================================================================
+
+Miền giá trị (range) từng thuộc tính số:
+Income                 2515000.0
+MntMeatProducts           1725.0
+MntWines                  1493.0
+Recency                    999.0
+MntGoldProds               362.0
+MntSweetProducts           263.0
+MntFishProducts            259.0
+MntFruits                  199.0
+Year_Birth                 103.0
+NumCatalogPurchases         28.0
+NumWebPurchases             27.0
+NumWebVisitsMonth           20.0
+NumDealsPurchases           15.0
+NumStorePurchases           13.0
+Kidhome                      2.0
+Teenhome                     2.0
+
+>> Thuộc tính có miền giá trị LỚN NHẤT: 'Income' (range = 2,515,000)
+>> Phương pháp làm mịn được chọn: smoothing theo giá trị trung bình (mean) của từng nhóm (bin).
+
+Số nhóm (bins) = 6. Biên các nhóm:
+['(-17515.0, 404166.667]', '(404166.667, 823333.333]', '(823333.333, 1242500.0]', '(1242500.0, 1661666.667]', '(1661666.667, 2080833.333]', '(2080833.333, 2500000.0]']
+Đã tạo cột mới 'Income_smoothed' = giá trị trung bình của nhóm chứa nó.
+      Income                      _bin  Income_smoothed
+0    58138.0    (-17515.0, 404166.667]         51918.08
+1    46344.0    (-17515.0, 404166.667]         51918.08
+2    26646.0    (-17515.0, 404166.667]         51918.08
+3    58293.0    (-17515.0, 404166.667]         51918.08
+4    62513.0    (-17515.0, 404166.667]         51918.08
+5    55635.0    (-17515.0, 404166.667]         51918.08
+6    33454.0    (-17515.0, 404166.667]         51918.08
+7    30351.0    (-17515.0, 404166.667]         51918.08
+8     5648.0    (-17515.0, 404166.667]         51918.08
+9  2500000.0  (2080833.333, 2500000.0]       2500000.00
+
+Độ lệch chuẩn từng thuộc tính số:
+Income                 57448.315087
+MntWines                 336.662693
+MntMeatProducts          225.764215
+MntFishProducts           54.619095
+MntGoldProds              52.179075
+MntSweetProducts          41.289521
+MntFruits                 39.779424
+Recency                   35.239637
+Year_Birth                12.082115
+NumStorePurchases          3.250466
+NumCatalogPurchases        2.923720
+NumWebPurchases            2.778102
+NumWebVisitsMonth          2.427027
+NumDealsPurchases          1.932466
+Teenhome                   0.544555
+Kidhome                    0.538436
+
+>> Thuộc tính có ĐỘ LỆCH CHUẨN LỚN NHẤT: 'Income' (std = 57,448.32)
+5 giá trị nhỏ nhất (index): [24, 1244, 20, 1523, 1845] -> [-15000.0, 1730.0, 2447.0, 3502.0, 4023.0]
+5 giá trị lớn nhất (index): [1299, 686, 616, 2232, 9] -> [157733.0, 160803.0, 162397.0, 666666.0, 2500000.0]
+Sau điều chỉnh (+10% cho 5 giá trị nhỏ nhất, -10% cho 5 giá trị lớn nhất):
+  nhỏ nhất -> [-16500.0, 1903.0, 2691.7, 3852.2, 4425.3]
+  lớn nhất -> [141959.7, 144722.7, 146157.3, 599999.4, 2250000.0]
+
+======================================================================
+(iii) XÁC ĐỊNH GIÁ TRỊ NGOẠI LỆ (Five-Number Summary)
+======================================================================
+              field      min      Q1  median      Q3       max     IQR  lower_bound  upper_bound  n_outliers
+         Year_Birth   1893.0  1959.0  1970.0  1977.0    1996.0    18.0      1932.00      2004.00           4
+             Income -16500.0 35688.0 51195.0 68001.5 2250000.0 32313.5    -12782.25    116471.75          10
+            Kidhome      0.0     0.0     0.0     1.0       2.0     1.0        -1.50         2.50           0
+           Teenhome      0.0     0.0     0.0     1.0       2.0     1.0        -1.50         2.50           0
+            Recency      0.0    24.0    49.0    74.0     999.0    50.0       -51.00       149.00           1
+           MntWines      0.0    23.5   173.0   504.5    1493.0   481.0      -698.00      1226.00          35
+          MntFruits      0.0     1.0     8.0    33.0     199.0    32.0       -47.00        81.00         227
+    MntMeatProducts      0.0    16.0    67.0   232.0    1725.0   216.0      -308.00       556.00         175
+    MntFishProducts      0.0     3.0    12.0    50.0     259.0    47.0       -67.50       120.50         223
+   MntSweetProducts      0.0     1.0     8.0    33.0     263.0    32.0       -47.00        81.00         248
+       MntGoldProds      0.0     9.0    24.0    56.0     362.0    47.0       -61.50       126.50         207
+  NumDealsPurchases      0.0     1.0     2.0     3.0      15.0     2.0        -2.00         6.00          86
+    NumWebPurchases      0.0     2.0     4.0     6.0      27.0     4.0        -4.00        12.00           4
+NumCatalogPurchases      0.0     0.0     2.0     4.0      28.0     4.0        -6.00        10.00          23
+  NumStorePurchases      0.0     3.0     5.0     8.0      13.0     5.0        -4.50        15.50           0
+  NumWebVisitsMonth      0.0     3.0     6.0     7.0      20.0     4.0        -3.00        13.00           8
+
+>> Quyết định xử lý: CHỈ winsorize (clip theo biên IQR) cho Income, Year_Birth, Recency vì đây là các outlier do lỗi nhập liệu/chèn lỗi có chủ đích (vi phạm ràng buộc nghiệp vụ). Các field Mnt*/Num* được GIỮ NGUYÊN vì outlier phản ánh hành vi mua sắm thật của khách hàng.
+>> Riêng Income: biên dưới IQR tính ra vẫn âm (~-12.782), nhưng thu nhập không thể âm về nghiệp vụ -> chặn thêm biên dưới tại 0 (MAX(lower_bound, 0)) trước khi winsorize.
+Trước xử lý: {'Income_max_before': np.float64(2250000.0), 'Income_min_before': np.float64(-16500.0), 'Year_Birth_min_before': np.float64(1893.0), 'Recency_max_before': np.float64(999.0)}
+Sau xử lý  : Income[min=0.0, max=116471.75], Year_Birth[min=1932.0], Recency[max=149.0]
+Số outlier được GIỮ NGUYÊN (không xử lý) ở các field Mnt*/Num*: 1236 giá trị trên 13 field.
+
+======================================================================
+(iv) XỬ LÝ DỮ LIỆU KHÔNG NHẤT QUÁN
+======================================================================
+
+-- (iv.1) Field kiểu NGÀY (Dt_Customer) --
+Chuyển kiểu dữ liệu ngày hiện tại (yyyy-mm-dd) thành chuỗi, sau đó CHỦ ĐỘNG sửa 5 giá trị sang định dạng khác (dd/mm/yyyy) để mô phỏng lỗi không nhất quán, rồi viết lệnh phát hiện & chuẩn hoá lại về yyyy-mm-dd.
+5 giá trị gốc (yyyy-mm-dd): ['2012-09-04', '2014-03-08', '2014-02-10', '2014-01-19', '2013-09-09']
+5 giá trị sau khi SV chủ động làm lỗi định dạng (dd/mm/yyyy): ['04/09/2012', '08/03/2014', '10/02/2014', '19/01/2014', '09/09/2013']
+5 giá trị sau khi chuẩn hoá lại: ['2012-09-04', '2014-03-08', '2014-02-10', '2014-01-19', '2013-09-09']
+Khớp hoàn toàn với giá trị gốc sau khi sửa lỗi: True
+
+-- (iv.2) Field kiểu DANH NGHĨA/THỨ TỰ (Marital_Status, Education) --
+Trước tiên xử lý các lỗi CÓ SẴN trong dữ liệu bẩn: khoảng trắng thừa + không nhất quán hoa/thường.
+Education sau chuẩn hoá: ['2n Cycle', 'Basic', 'Graduation', 'Master', 'PhD']
+Marital_Status sau chuẩn hoá: ['Absurd', 'Alone', 'Divorced', 'Married', 'Single', 'Together', 'Widow', 'YOLO']
+
+Mô phỏng thêm: SV chủ động làm lỗi 5 giá trị Education rồi tự sửa lại bằng lệnh hiệu chỉnh.
+Giá trị gốc: ['Graduation', 'PhD', 'PhD', 'PhD', 'Graduation']
+Giá trị sau khi chủ động làm lỗi: ['GRADUATION', 'phd', '  PhD  ', 'Phd', 'Graduation']
+Giá trị sau khi hiệu chỉnh lại: ['Graduation', 'PhD', 'PhD', 'PhD', 'Graduation']
+Khớp hoàn toàn với giá trị gốc: True
+
+>>> Đã lưu dữ liệu sau bước Data Cleaning vào: /Users/nguyenquochung/Desktop/Năm 4/HK1/Phương pháp phân tích dữ liệu cơ bản/BCCCM/NguyenQuocHung_2311110060/outputs/python/_intermediate_after_cleaning_python.csv
+>>> Kích thước cuối cùng sau Data Cleaning: (2239, 30)

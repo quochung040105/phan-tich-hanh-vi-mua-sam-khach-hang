@@ -1,0 +1,156 @@
+======================================================================
+KÍCH THƯỚC FILE 'BEFORE': 2249 dòng x 29 cột
+======================================================================
+
+--- 1. Tổng số giá trị thiếu (NaN) theo từng cột ---
+ID                      5
+Year_Birth              5
+Education              30
+Marital_Status         30
+Income                 53
+Kidhome                 5
+Teenhome                5
+Dt_Customer            30
+Recency                 5
+MntWines                5
+MntFruits               5
+MntMeatProducts         5
+MntFishProducts         5
+MntSweetProducts        5
+MntGoldProds            5
+NumDealsPurchases       5
+NumWebPurchases         5
+NumCatalogPurchases     5
+NumStorePurchases       5
+NumWebVisitsMonth       5
+AcceptedCmp3            5
+AcceptedCmp4            5
+AcceptedCmp5            5
+AcceptedCmp1            5
+AcceptedCmp2            5
+Complain                5
+Z_CostContact           5
+Z_Revenue               5
+Response                5
+
+--- 2. Số dòng trùng lặp hoàn toàn (duplicate rows) ---
+8
+
+--- 3. Số ID bị trùng lặp ---
+9
+Chi tiết các dòng có ID trùng:
+        ID Year_Birth   Education Marital_Status
+2     4141       1965  Graduation       Together
+5     7446       1967      Master       Together
+12    2125       1959  Graduation       Divorced
+18    6565       1949      Master        Married
+35    4141       1951      Master         Single
+45    1371       1976  Graduation         Single
+2240  7446       1967      Master       Together
+2241  2125       1959  Graduation       Divorced
+2242  6565       1949      Master        Married
+2243  1371       1976  Graduation         Single
+
+--- 4. Số dòng trống hoàn toàn (toàn bộ field đều NULL) ---
+5
+
+--- Value counts cho field 'Education' (bao gồm cả khoảng trắng thừa) ---
+Education
+Graduation          1099
+PhD                  468
+Master               361
+2n Cycle             198
+Basic                 52
+NaN                   30
+   Graduation         20
+   PhD                 9
+   Master              5
+   2n Cycle            4
+   Basic               2
+phd                    1
+>> Tất cả biến thể (chuỗi gốc, chưa strip) trong 'Education': ['   2n Cycle   ', '   Basic   ', '   Graduation   ', '   Master   ', '   PhD   ', '2n Cycle', 'Basic', 'Graduation', 'Master', 'PhD', 'phd']
+
+--- Value counts cho field 'Marital_Status' (bao gồm cả khoảng trắng thừa) ---
+Marital_Status
+Married           843
+Together          561
+Single            468
+Divorced          224
+Widow              74
+NaN                30
+   Married         16
+   Together        12
+   Single           6
+   Divorced         5
+Alone               3
+Absurd              2
+YOLO                2
+single              1
+MARRIED             1
+   Widow            1
+>> Tất cả biến thể (chuỗi gốc, chưa strip) trong 'Marital_Status': ['   Divorced   ', '   Married   ', '   Single   ', '   Together   ', '   Widow   ', 'Absurd', 'Alone', 'Divorced', 'MARRIED', 'Married', 'Single', 'Together', 'Widow', 'YOLO', 'single']
+
+--- 5. Value counts cho các field boolean (0/1) ---
+
+AcceptedCmp3:
+AcceptedCmp3
+0.0    2081
+1.0     163
+NaN       5
+
+AcceptedCmp4:
+AcceptedCmp4
+0.0    2077
+1.0     167
+NaN       5
+
+AcceptedCmp5:
+AcceptedCmp5
+0.0    2081
+1.0     163
+NaN       5
+
+AcceptedCmp1:
+AcceptedCmp1
+0.0    2099
+1.0     145
+NaN       5
+
+AcceptedCmp2:
+AcceptedCmp2
+0.0    2214
+1.0      30
+NaN       5
+
+Complain:
+Complain
+0.0    2223
+1.0      21
+NaN       5
+
+Response:
+Response
+0.0    1910
+1.0     334
+NaN       5
+
+--- 6. Field Year_Birth: các giá trị không phải số (nghi vấn outlier/lỗi nhập liệu) ---
+Giá trị không parse được thành số: ['Unknown']
+Giá trị Year_Birth nhỏ nhất (nghi vấn outlier do nhập liệu sai): [np.float64(1893.0), np.float64(1899.0), np.float64(1900.0), np.float64(1940.0), np.float64(1941.0)]
+
+--- 7. Field Income: thống kê nhanh ---
+count    2.196000e+03
+mean     5.336935e+04
+std      5.800858e+04
+min     -1.500000e+04
+25%      3.533550e+04
+50%      5.141150e+04
+75%      6.848700e+04
+max      2.500000e+06
+Giá trị Income nhỏ nhất: -15000.0 | lớn nhất: 2500000.0
+
+--- 8. Field Recency: thống kê nhanh (phát hiện giá trị 999 bất thường) ---
+Giá trị Recency lớn nhất: 999.0 | số dòng = 999: 1
+
+--- 9. Field Dt_Customer: ví dụ các giá trị có khoảng trắng thừa ---
+Số giá trị có khoảng trắng thừa: 39; ví dụ: ['   2014-05-12   ', '   2014-06-21   ', '   2014-01-05   ', '   2014-06-08   ', '   2013-10-04   ']

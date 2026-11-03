@@ -1,0 +1,61 @@
+Kích thước dữ liệu sau tiền xử lý: (2239, 33)
+
+--- BẢNG THỐNG KÊ MÔ TẢ THEO TỪNG FIELD ---
+                     field        kieu      mean                                   mode   median       std      min      q25      q50      q75        max
+                Year_Birth     numeric  1968.846                                 1976.0  1970.00    11.789  1932.00  1959.00  1970.00  1977.00    1996.00
+                    Income     numeric 51853.051                                 7500.0 51195.00 20883.137     0.00 35688.00 51195.00 68001.50  116471.75
+                   Kidhome     numeric     0.444                                    0.0     0.00     0.538     0.00     0.00     0.00     1.00       2.00
+                  Teenhome     numeric     0.506                                    0.0     0.00     0.545     0.00     0.00     0.00     1.00       2.00
+                   Recency     numeric    49.171                                   56.0    49.00    29.040     0.00    24.00    49.00    74.00     149.00
+                  MntWines     numeric   303.881                                    2.0   173.00   336.663     0.00    23.50   173.00   504.50    1493.00
+                 MntFruits     numeric    26.292                                    0.0     8.00    39.779     0.00     1.00     8.00    33.00     199.00
+           MntMeatProducts     numeric   166.968                                    7.0    67.00   225.764     0.00    16.00    67.00   232.00    1725.00
+           MntFishProducts     numeric    37.493                                    0.0    12.00    54.619     0.00     3.00    12.00    50.00     259.00
+          MntSweetProducts     numeric    27.066                                    0.0     8.00    41.290     0.00     1.00     8.00    33.00     263.00
+              MntGoldProds     numeric    44.023                                    1.0    24.00    52.179     0.00     9.00    24.00    56.00     362.00
+         NumDealsPurchases     numeric     2.326                                    1.0     2.00     1.932     0.00     1.00     2.00     3.00      15.00
+           NumWebPurchases     numeric     4.083                                    2.0     4.00     2.778     0.00     2.00     4.00     6.00      27.00
+       NumCatalogPurchases     numeric     2.662                                    0.0     2.00     2.924     0.00     0.00     2.00     4.00      28.00
+         NumStorePurchases     numeric     5.788                                    3.0     5.00     3.250     0.00     3.00     5.00     8.00      13.00
+         NumWebVisitsMonth     numeric     5.317                                    7.0     6.00     2.427     0.00     3.00     6.00     7.00      20.00
+              AcceptedCmp3     numeric     0.073                                      0     0.00     0.260     0.00     0.00     0.00     0.00       1.00
+              AcceptedCmp4     numeric     0.075                                      0     0.00     0.263     0.00     0.00     0.00     0.00       1.00
+              AcceptedCmp5     numeric     0.073                                      0     0.00     0.260     0.00     0.00     0.00     0.00       1.00
+              AcceptedCmp1     numeric     0.064                                      0     0.00     0.245     0.00     0.00     0.00     0.00       1.00
+              AcceptedCmp2     numeric     0.013                                      0     0.00     0.115     0.00     0.00     0.00     0.00       1.00
+                  Complain     numeric     0.009                                      0     0.00     0.096     0.00     0.00     0.00     0.00       1.00
+                  Response     numeric     0.149                                      0     0.00     0.356     0.00     0.00     0.00     0.00       1.00
+           Income_smoothed     numeric 53286.025                               51918.08 51918.08 53337.370 51918.08 51918.08 51918.08 51918.08 2500000.00
+         Education_encoded     numeric     2.451                                      2     2.00     1.000     0.00     2.00     2.00     3.00       4.00
+    Marital_Status_encoded     numeric     3.719                                      3     4.00     1.071     0.00     3.00     4.00     5.00       7.00
+Campaigns_Response_Bitmask     numeric    11.089                                      0     0.00    24.619     0.00     0.00     0.00     1.00     101.00
+Product_Categories_Bitmask     numeric    57.397                                     63    63.00    10.341     5.00    55.00    63.00    63.00      63.00
+                 Education categorical       NaN                             Graduation      NaN       NaN      NaN      NaN      NaN      NaN        NaN
+            Marital_Status categorical       NaN                                Married      NaN       NaN      NaN      NaN      NaN      NaN        NaN
+               Dt_Customer categorical       NaN                             2013-07-09      NaN       NaN      NaN      NaN      NaN      NaN        NaN
+        Products_Purchased categorical       NaN Wines, Fruits, Meat, Fish, Sweet, Gold      NaN       NaN      NaN      NaN      NaN      NaN        NaN
+
+======================================================================
+MA TRẬN TƯƠNG QUAN & MA TRẬN KHÁC BIỆT CHO 3 RECORD TUỲ CHỌN
+======================================================================
+3 record được chọn (theo ID): [5524.0, 387.0, 5376.0]
+
+Dữ liệu số của 3 record được chọn:
+        Year_Birth   Income  Kidhome  Teenhome  Recency  MntWines  MntFruits  MntMeatProducts  MntFishProducts  MntSweetProducts  MntGoldProds  NumDealsPurchases  NumWebPurchases  NumCatalogPurchases  NumStorePurchases  NumWebVisitsMonth  AcceptedCmp3  AcceptedCmp4  AcceptedCmp5  AcceptedCmp1  AcceptedCmp2  Complain  Response  Income_smoothed  Education_encoded  Marital_Status_encoded  Campaigns_Response_Bitmask  Product_Categories_Bitmask
+ID                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+5524.0      1957.0  58138.0      0.0       0.0     58.0     635.0       88.0            546.0            172.0              88.0          88.0                3.0              8.0                 10.0                4.0                7.0             0             0             0             0             0         0         1         51918.08                  2                       4                          64                          63
+387.0       1976.0   7500.0      0.0       0.0     59.0       6.0       16.0             11.0             11.0               1.0          16.0                1.0              2.0                  0.0                3.0                8.0             0             0             0             0             0         0         0         51918.08                  0                       3                           0                          63
+5376.0      1979.0   2691.7      1.0       0.0     42.0       1.0        1.0           1725.0              1.0               1.0           1.0               15.0              0.0                 28.0                0.0                1.0             0             0             0             0             0         0         0         51918.08                  2                       3                           0                          63
+
+--- Ma trận tương quan (Pearson) giữa 3 record (tính trên vector các thuộc tính số) ---
+ID      5524.0  387.0   5376.0
+ID                            
+5524.0   1.000  0.7520  0.6870
+387.0    0.752  1.0000  0.9951
+5376.0   0.687  0.9951  1.0000
+
+--- Ma trận khác biệt (Euclidean distance, sau khi chuẩn hoá z-score) giữa 3 record ---
+        5524.0  387.0   5376.0
+5524.0  0.0000  7.1587  8.9577
+387.0   7.1587  0.0000  6.2859
+5376.0  8.9577  6.2859  0.0000

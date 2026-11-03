@@ -1,0 +1,992 @@
+=== Khởi tạo database SQLite: /Users/nguyenquochung/Desktop/Năm 4/HK1/Phương pháp phân tích dữ liệu cơ bản/BCCCM/NguyenQuocHung_2311110060/outputs/sql/pipeline.db ===
+Đã import 'NguyenQuocHung_customer_personality.csv' vào bảng 'customers_before': 2249 dòng x 29 cột
+
+======================================================================
+>>> ĐANG CHẠY: 01_eda.sql
+======================================================================
+
+-- SQL --
+SELECT Education, COUNT(*) AS so_luong
+FROM customers_before
+GROUP BY Education
+ORDER BY so_luong DESC
+-- KẾT QUẢ (12 dòng, hiển thị tối đa 20) --
+       Education  so_luong
+      Graduation      1099
+             PhD       468
+          Master       361
+        2n Cycle       198
+           Basic        52
+            None        30
+   Graduation           20
+          PhD            9
+       Master            5
+     2n Cycle            4
+        Basic            2
+             phd         1
+
+-- SQL --
+SELECT Marital_Status, COUNT(*) AS so_luong
+FROM customers_before
+GROUP BY Marital_Status
+ORDER BY so_luong DESC
+-- KẾT QUẢ (16 dòng, hiển thị tối đa 20) --
+Marital_Status  so_luong
+       Married       843
+      Together       561
+        Single       468
+      Divorced       224
+         Widow        74
+          None        30
+    Married           16
+   Together           12
+     Single            6
+   Divorced            5
+         Alone         3
+          YOLO         2
+        Absurd         2
+        single         1
+       MARRIED         1
+      Widow            1
+
+-- SQL --
+SELECT
+    SUM(CASE WHEN ID IS NULL THEN 1 ELSE 0 END) AS null_ID,
+    SUM(CASE WHEN Year_Birth IS NULL THEN 1 ELSE 0 END) AS null_Year_Birth,
+    SUM(CASE WHEN Education IS NULL THEN 1 ELSE 0 END) AS null_Education,
+    SUM(CASE WHEN Marital_Status IS NULL THEN 1 ELSE 0 END) AS null_Marital_Status,
+    SUM(CASE WHEN Income IS NULL THEN 1 ELSE 0 END) AS null_Income,
+    SUM(CASE WHEN Dt_Customer IS NULL THEN 1 ELSE 0 END) AS null_Dt_Customer
+FROM customers_before
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ null_ID  null_Year_Birth  null_Education  null_Marital_Status  null_Income  null_Dt_Customer
+       5                5              30                   30           53                30
+
+-- SQL --
+SELECT COUNT(*) AS so_dong_trong
+FROM customers_before
+WHERE ID IS NULL
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ so_dong_trong
+             5
+
+-- SQL --
+SELECT ID, COUNT(*) AS so_lan_xuat_hien
+FROM customers_before
+WHERE ID IS NOT NULL
+GROUP BY ID
+HAVING COUNT(*) > 1
+-- KẾT QUẢ (5 dòng, hiển thị tối đa 20) --
+  ID  so_lan_xuat_hien
+1371                 2
+2125                 2
+4141                 2
+6565                 2
+7446                 2
+
+-- SQL --
+SELECT COUNT(*) AS so_dong_du_thua FROM (
+    SELECT ID, Year_Birth, Education, Marital_Status, Income, Kidhome, Teenhome,
+           Dt_Customer, Recency, MntWines, MntFruits, MntMeatProducts, MntFishProducts,
+           MntSweetProducts, MntGoldProds, NumDealsPurchases, NumWebPurchases,
+           NumCatalogPurchases, NumStorePurchases, NumWebVisitsMonth,
+           AcceptedCmp3, AcceptedCmp4, AcceptedCmp5, AcceptedCmp1, AcceptedCmp2,
+           Complain, Z_CostContact, Z_Revenue, Response, COUNT(*) AS cnt
+    FROM customers_before
+    WHERE ID IS NOT NULL
+    GROUP BY ID, Year_Birth, Education, Marital_Status, Income, Kidhome, Teenhome,
+             Dt_Customer, Recency, MntWines, MntFruits, MntMeatProducts, MntFishProducts,
+             MntSweetProducts, MntGoldProds, NumDealsPurchases, NumWebPurchases,
+             NumCatalogPurchases, NumStorePurchases, NumWebVisitsMonth,
+             AcceptedCmp3, AcceptedCmp4, AcceptedCmp5, AcceptedCmp1, AcceptedCmp2,
+             Complain, Z_CostContact, Z_Revenue, Response
+    HAVING COUNT(*) > 1
+)
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ so_dong_du_thua
+               4
+
+-- SQL --
+SELECT MIN(CAST(Income AS REAL)) AS income_min, MAX(CAST(Income AS REAL)) AS income_max
+FROM customers_before WHERE Income IS NOT NULL
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ income_min  income_max
+   -15000.0   2500000.0
+
+-- SQL --
+SELECT COUNT(*) AS so_dong_recency_999
+FROM customers_before WHERE CAST(Recency AS REAL) = 999
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ so_dong_recency_999
+                   1
+
+-- SQL --
+SELECT Year_Birth, COUNT(*) AS so_luong
+FROM customers_before
+WHERE Year_Birth IS NOT NULL AND CAST(Year_Birth AS INTEGER) = 0
+GROUP BY Year_Birth
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+Year_Birth  so_luong
+   Unknown         1
+
+======================================================================
+>>> ĐANG CHẠY: 02_cleaning.sql
+======================================================================
+
+-- SQL --
+DROP TABLE IF EXISTS customers_work
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+CREATE TABLE customers_work (
+    ID REAL, Year_Birth REAL, Education TEXT, Marital_Status TEXT, Income REAL,
+    Kidhome REAL, Teenhome REAL, Dt_Customer TEXT, Recency REAL,
+    MntWines REAL, MntFruits REAL, MntMeatProducts REAL, MntFishProducts REAL,
+    MntSweetProducts REAL, MntGoldProds REAL,
+    NumDealsPurchases REAL, NumWebPurchases REAL, NumCatalogPurchases REAL,
+    NumStorePurchases REAL, NumWebVisitsMonth REAL,
+    AcceptedCmp3 REAL, AcceptedCmp4 REAL, AcceptedCmp5 REAL, AcceptedCmp1 REAL,
+    AcceptedCmp2 REAL, Complain REAL, Z_CostContact REAL, Z_Revenue REAL, Response REAL
+)
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+INSERT INTO customers_work
+SELECT
+    CAST(ID AS REAL),
+    CASE WHEN TRIM(Year_Birth) = 'Unknown' THEN NULL ELSE CAST(Year_Birth AS REAL) END,
+    TRIM(Education), TRIM(Marital_Status), CAST(Income AS REAL),
+    CAST(Kidhome AS REAL), CAST(Teenhome AS REAL), TRIM(Dt_Customer), CAST(Recency AS REAL),
+    CAST(MntWines AS REAL), CAST(MntFruits AS REAL), CAST(MntMeatProducts AS REAL), CAST(MntFishProducts AS REAL),
+    CAST(MntSweetProducts AS REAL), CAST(MntGoldProds AS REAL),
+    CAST(NumDealsPurchases AS REAL), CAST(NumWebPurchases AS REAL), CAST(NumCatalogPurchases AS REAL),
+    CAST(NumStorePurchases AS REAL), CAST(NumWebVisitsMonth AS REAL),
+    CAST(AcceptedCmp3 AS REAL), CAST(AcceptedCmp4 AS REAL), CAST(AcceptedCmp5 AS REAL), CAST(AcceptedCmp1 AS REAL),
+    CAST(AcceptedCmp2 AS REAL), CAST(Complain AS REAL), CAST(Z_CostContact AS REAL), CAST(Z_Revenue AS REAL), CAST(Response AS REAL)
+FROM customers_before
+-- Đã thực thi (rowcount=2249) --
+
+-- SQL --
+SELECT COUNT(*) AS so_dong_ban_dau FROM customers_work
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ so_dong_ban_dau
+            2249
+
+-- SQL --
+DELETE FROM customers_work WHERE ID IS NULL
+-- Đã thực thi (rowcount=5) --
+
+-- SQL --
+SELECT COUNT(*) AS so_dong_sau_khi_xoa_dong_trong FROM customers_work
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ so_dong_sau_khi_xoa_dong_trong
+                           2244
+
+-- SQL --
+DELETE FROM customers_work
+WHERE rowid NOT IN (
+    SELECT MIN(rowid) FROM customers_work
+    GROUP BY ID, Year_Birth, Education, Marital_Status, Income, Kidhome, Teenhome,
+             Dt_Customer, Recency, MntWines, MntFruits, MntMeatProducts, MntFishProducts,
+             MntSweetProducts, MntGoldProds, NumDealsPurchases, NumWebPurchases,
+             NumCatalogPurchases, NumStorePurchases, NumWebVisitsMonth,
+             AcceptedCmp3, AcceptedCmp4, AcceptedCmp5, AcceptedCmp1, AcceptedCmp2,
+             Complain, Z_CostContact, Z_Revenue, Response
+)
+-- Đã thực thi (rowcount=4) --
+
+-- SQL --
+SELECT COUNT(*) AS so_dong_sau_khi_xoa_trung_lap_hoan_toan FROM customers_work
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ so_dong_sau_khi_xoa_trung_lap_hoan_toan
+                                    2240
+
+-- SQL --
+DELETE FROM customers_work
+WHERE rowid NOT IN (
+    SELECT rowid FROM (
+        SELECT rowid,
+            ROW_NUMBER() OVER (
+                PARTITION BY ID
+                ORDER BY (
+                    (CASE WHEN Income IS NULL THEN 1 ELSE 0 END) +
+                    (CASE WHEN Education IS NULL THEN 1 ELSE 0 END) +
+                    (CASE WHEN Marital_Status IS NULL THEN 1 ELSE 0 END) +
+                    (CASE WHEN Dt_Customer IS NULL THEN 1 ELSE 0 END)
+                ) ASC, rowid ASC
+            ) AS rn
+        FROM customers_work
+    )
+    WHERE rn = 1
+)
+-- Đã thực thi (rowcount=1) --
+
+-- SQL --
+SELECT COUNT(*) AS so_dong_sau_khi_xu_ly_ID_trung FROM customers_work
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ so_dong_sau_khi_xu_ly_ID_trung
+                           2239
+
+-- SQL --
+SELECT COUNT(*) AS income_null_truoc_khi_dien FROM customers_work WHERE Income IS NULL
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ income_null_truoc_khi_dien
+                         48
+
+-- SQL --
+CREATE TEMP TABLE income_median_by_edu AS
+WITH ranked AS (
+    SELECT Education, Income,
+           ROW_NUMBER() OVER (PARTITION BY Education ORDER BY Income) AS rn,
+           COUNT(*) OVER (PARTITION BY Education) AS cnt
+    FROM customers_work WHERE Income IS NOT NULL AND Education IS NOT NULL
+)
+SELECT Education,
+       CAST(ROUND(AVG(Income) / 100.0) AS INTEGER) * 100 AS median_income
+FROM ranked
+WHERE rn IN ((cnt + 1) / 2, (cnt + 2) / 2)
+GROUP BY Education
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+SELECT * FROM income_median_by_edu
+-- KẾT QUẢ (6 dòng, hiển thị tối đa 20) --
+ Education  median_income
+  2n Cycle          46800
+     Basic          21100
+Graduation          52100
+    Master          50900
+       PhD          55200
+       phd          65500
+
+-- SQL --
+UPDATE customers_work
+SET Income = (SELECT median_income FROM income_median_by_edu WHERE income_median_by_edu.Education = customers_work.Education)
+WHERE Income IS NULL AND Education IS NOT NULL
+  AND EXISTS (SELECT 1 FROM income_median_by_edu WHERE income_median_by_edu.Education = customers_work.Education)
+-- Đã thực thi (rowcount=47) --
+
+-- SQL --
+CREATE TEMP TABLE income_median_global AS
+WITH ranked AS (
+    SELECT Income, ROW_NUMBER() OVER (ORDER BY Income) AS rn, COUNT(*) OVER () AS cnt
+    FROM customers_work WHERE Income IS NOT NULL
+)
+SELECT CAST(ROUND(AVG(Income) / 100.0) AS INTEGER) * 100 AS median_income
+FROM ranked WHERE rn IN ((cnt + 1) / 2, (cnt + 2) / 2)
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+UPDATE customers_work SET Income = (SELECT median_income FROM income_median_global) WHERE Income IS NULL
+-- Đã thực thi (rowcount=1) --
+
+-- SQL --
+SELECT COUNT(*) AS income_null_sau_khi_dien FROM customers_work WHERE Income IS NULL
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ income_null_sau_khi_dien
+                        0
+
+-- SQL --
+SELECT COUNT(*) AS year_birth_null_truoc_khi_dien FROM customers_work WHERE Year_Birth IS NULL
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ year_birth_null_truoc_khi_dien
+                              1
+
+-- SQL --
+CREATE TEMP TABLE yb_mode AS
+SELECT Year_Birth, COUNT(*) AS cnt
+FROM customers_work WHERE Year_Birth IS NOT NULL
+GROUP BY Year_Birth
+ORDER BY cnt DESC, Year_Birth ASC
+LIMIT 1
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+SELECT * FROM yb_mode
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ Year_Birth  cnt
+     1976.0   89
+
+-- SQL --
+UPDATE customers_work SET Year_Birth = (SELECT Year_Birth FROM yb_mode) WHERE Year_Birth IS NULL
+-- Đã thực thi (rowcount=1) --
+
+-- SQL --
+SELECT COUNT(*) AS year_birth_null_sau_khi_dien FROM customers_work WHERE Year_Birth IS NULL
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ year_birth_null_sau_khi_dien
+                            0
+
+-- SQL --
+SELECT COUNT(*) AS education_null_truoc_khi_dien FROM customers_work WHERE Education IS NULL
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ education_null_truoc_khi_dien
+                            25
+
+-- SQL --
+CREATE TEMP TABLE edu_mode_by_marital AS
+WITH edu_counts AS (
+    SELECT Marital_Status, Education, COUNT(*) AS cnt
+    FROM customers_work WHERE Education IS NOT NULL AND Marital_Status IS NOT NULL
+    GROUP BY Marital_Status, Education
+),
+edu_ranked AS (
+    SELECT Marital_Status, Education, cnt,
+           ROW_NUMBER() OVER (PARTITION BY Marital_Status ORDER BY cnt DESC, Education ASC) AS rn
+    FROM edu_counts
+)
+SELECT Marital_Status, Education FROM edu_ranked WHERE rn = 1
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+SELECT * FROM edu_mode_by_marital
+-- KẾT QUẢ (10 dòng, hiển thị tối đa 20) --
+Marital_Status  Education
+        Absurd Graduation
+         Alone Graduation
+      Divorced Graduation
+       MARRIED        PhD
+       Married Graduation
+        Single Graduation
+      Together Graduation
+         Widow Graduation
+          YOLO        PhD
+        single        PhD
+
+-- SQL --
+UPDATE customers_work
+SET Education = (SELECT Education FROM edu_mode_by_marital WHERE edu_mode_by_marital.Marital_Status = customers_work.Marital_Status)
+WHERE Education IS NULL AND Marital_Status IS NOT NULL
+  AND EXISTS (SELECT 1 FROM edu_mode_by_marital WHERE edu_mode_by_marital.Marital_Status = customers_work.Marital_Status)
+-- Đã thực thi (rowcount=25) --
+
+-- SQL --
+CREATE TEMP TABLE edu_mode_global AS
+SELECT Education, COUNT(*) AS cnt FROM customers_work WHERE Education IS NOT NULL
+GROUP BY Education ORDER BY cnt DESC, Education ASC LIMIT 1
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+UPDATE customers_work SET Education = (SELECT Education FROM edu_mode_global) WHERE Education IS NULL
+-- Đã thực thi (rowcount=0) --
+
+-- SQL --
+SELECT COUNT(*) AS education_null_sau_khi_dien FROM customers_work WHERE Education IS NULL
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ education_null_sau_khi_dien
+                           0
+
+-- SQL --
+SELECT COUNT(*) AS marital_null_truoc_khi_dien FROM customers_work WHERE Marital_Status IS NULL
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ marital_null_truoc_khi_dien
+                          25
+
+-- SQL --
+CREATE TEMP TABLE marital_mode_by_edu AS
+WITH ms_counts AS (
+    SELECT Education, Marital_Status, COUNT(*) AS cnt
+    FROM customers_work WHERE Marital_Status IS NOT NULL AND Education IS NOT NULL
+    GROUP BY Education, Marital_Status
+),
+ms_ranked AS (
+    SELECT Education, Marital_Status, cnt,
+           ROW_NUMBER() OVER (PARTITION BY Education ORDER BY cnt DESC, Marital_Status ASC) AS rn
+    FROM ms_counts
+)
+SELECT Education, Marital_Status FROM ms_ranked WHERE rn = 1
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+SELECT * FROM marital_mode_by_edu
+-- KẾT QUẢ (6 dòng, hiển thị tối đa 20) --
+ Education Marital_Status
+  2n Cycle        Married
+     Basic        Married
+Graduation        Married
+    Master        Married
+       PhD        Married
+       phd          Widow
+
+-- SQL --
+UPDATE customers_work
+SET Marital_Status = (SELECT Marital_Status FROM marital_mode_by_edu WHERE marital_mode_by_edu.Education = customers_work.Education)
+WHERE Marital_Status IS NULL AND Education IS NOT NULL
+  AND EXISTS (SELECT 1 FROM marital_mode_by_edu WHERE marital_mode_by_edu.Education = customers_work.Education)
+-- Đã thực thi (rowcount=25) --
+
+-- SQL --
+SELECT COUNT(*) AS marital_null_sau_khi_dien FROM customers_work WHERE Marital_Status IS NULL
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ marital_null_sau_khi_dien
+                         0
+
+-- SQL --
+SELECT COUNT(*) AS dt_null_truoc_khi_dien FROM customers_work WHERE Dt_Customer IS NULL
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ dt_null_truoc_khi_dien
+                     24
+
+-- SQL --
+CREATE TEMP TABLE dt_median AS
+WITH ranked AS (
+    SELECT Dt_Customer, julianday(Dt_Customer) AS jd,
+           ROW_NUMBER() OVER (ORDER BY julianday(Dt_Customer)) AS rn,
+           COUNT(*) OVER () AS cnt
+    FROM customers_work WHERE Dt_Customer IS NOT NULL
+)
+SELECT date(AVG(jd)) AS median_date FROM ranked WHERE rn IN ((cnt + 1) / 2, (cnt + 2) / 2)
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+SELECT * FROM dt_median
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+median_date
+ 2013-07-09
+
+-- SQL --
+UPDATE customers_work SET Dt_Customer = (SELECT median_date FROM dt_median) WHERE Dt_Customer IS NULL
+-- Đã thực thi (rowcount=24) --
+
+-- SQL --
+SELECT COUNT(*) AS dt_null_sau_khi_dien FROM customers_work WHERE Dt_Customer IS NULL
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ dt_null_sau_khi_dien
+                    0
+
+-- SQL --
+SELECT SUM(
+    (CASE WHEN Income IS NULL THEN 1 ELSE 0 END) + (CASE WHEN Year_Birth IS NULL THEN 1 ELSE 0 END) +
+    (CASE WHEN Education IS NULL THEN 1 ELSE 0 END) + (CASE WHEN Marital_Status IS NULL THEN 1 ELSE 0 END) +
+    (CASE WHEN Dt_Customer IS NULL THEN 1 ELSE 0 END)
+) AS tong_null_con_lai_5_field_chinh FROM customers_work
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ tong_null_con_lai_5_field_chinh
+                               0
+
+-- SQL --
+ALTER TABLE customers_work ADD COLUMN Income_smoothed REAL
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+CREATE TEMP TABLE income_bins AS
+SELECT rowid AS rid, Income, NTILE(6) OVER (ORDER BY Income) AS bin
+FROM customers_work
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+CREATE TEMP TABLE income_bin_means AS
+SELECT bin, AVG(Income) AS bin_mean FROM income_bins GROUP BY bin
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+SELECT * FROM income_bin_means ORDER BY bin
+-- KẾT QUẢ (6 dòng, hiển thị tối đa 20) --
+ bin     bin_mean
+   1 21566.045455
+   2 35474.310992
+   3 46275.163539
+   4 56860.667560
+   5 68074.268097
+   6 91562.509383
+
+-- SQL --
+UPDATE customers_work
+SET Income_smoothed = (
+    SELECT ROUND(bm.bin_mean, 2) FROM income_bins ib JOIN income_bin_means bm ON ib.bin = bm.bin
+    WHERE ib.rid = customers_work.rowid
+)
+-- Đã thực thi (rowcount=2239) --
+
+-- SQL --
+SELECT
+    AVG(Income) AS mean_income,
+    SQRT(AVG(Income * Income) - AVG(Income) * AVG(Income)) AS std_income
+FROM customers_work
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ mean_income  std_income
+53287.986601 57433.81342
+
+-- SQL --
+UPDATE customers_work
+SET Income = Income * 1.10
+WHERE rowid IN (SELECT rowid FROM customers_work ORDER BY Income ASC LIMIT 5)
+-- Đã thực thi (rowcount=5) --
+
+-- SQL --
+UPDATE customers_work
+SET Income = Income * 0.90
+WHERE rowid IN (SELECT rowid FROM customers_work ORDER BY Income DESC LIMIT 5)
+-- Đã thực thi (rowcount=5) --
+
+-- SQL --
+CREATE TEMP TABLE income_bounds AS
+WITH ranked AS (
+    SELECT Income, ROW_NUMBER() OVER (ORDER BY Income) AS rn, COUNT(*) OVER () AS cnt
+    FROM customers_work
+),
+q AS (
+    SELECT
+        (SELECT Income FROM ranked WHERE rn = CAST(cnt * 0.25 AS INTEGER) + 1) AS q1,
+        (SELECT Income FROM ranked WHERE rn = CAST(cnt * 0.75 AS INTEGER) + 1) AS q3
+    FROM ranked LIMIT 1
+)
+SELECT q1, q3, (q3 - q1) AS iqr, MAX(q1 - 1.5 * (q3 - q1), 0) AS lower_b, q3 + 1.5 * (q3 - q1) AS upper_b FROM q
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+SELECT 'Income' AS field, * FROM income_bounds
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ field      q1      q3     iqr  lower_b  upper_b
+Income 35688.0 68092.0 32404.0        0 116698.0
+
+-- SQL --
+SELECT COUNT(*) AS income_so_outlier
+FROM customers_work, income_bounds
+WHERE customers_work.Income < income_bounds.lower_b OR customers_work.Income > income_bounds.upper_b
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ income_so_outlier
+                10
+
+-- SQL --
+UPDATE customers_work
+SET Income = CASE
+    WHEN Income < (SELECT lower_b FROM income_bounds) THEN (SELECT lower_b FROM income_bounds)
+    WHEN Income > (SELECT upper_b FROM income_bounds) THEN (SELECT upper_b FROM income_bounds)
+    ELSE Income END
+-- Đã thực thi (rowcount=2239) --
+
+-- SQL --
+CREATE TEMP TABLE yearbirth_bounds AS
+WITH ranked AS (
+    SELECT Year_Birth, ROW_NUMBER() OVER (ORDER BY Year_Birth) AS rn, COUNT(*) OVER () AS cnt
+    FROM customers_work
+),
+q AS (
+    SELECT
+        (SELECT Year_Birth FROM ranked WHERE rn = CAST(cnt * 0.25 AS INTEGER) + 1) AS q1,
+        (SELECT Year_Birth FROM ranked WHERE rn = CAST(cnt * 0.75 AS INTEGER) + 1) AS q3
+    FROM ranked LIMIT 1
+)
+SELECT q1, q3, (q3 - q1) AS iqr, q1 - 1.5 * (q3 - q1) AS lower_b, q3 + 1.5 * (q3 - q1) AS upper_b FROM q
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+SELECT 'Year_Birth' AS field, * FROM yearbirth_bounds
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+     field     q1     q3  iqr  lower_b  upper_b
+Year_Birth 1959.0 1977.0 18.0   1932.0   2004.0
+
+-- SQL --
+SELECT COUNT(*) AS yearbirth_so_outlier
+FROM customers_work, yearbirth_bounds
+WHERE customers_work.Year_Birth < yearbirth_bounds.lower_b OR customers_work.Year_Birth > yearbirth_bounds.upper_b
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ yearbirth_so_outlier
+                    4
+
+-- SQL --
+UPDATE customers_work
+SET Year_Birth = CASE
+    WHEN Year_Birth < (SELECT lower_b FROM yearbirth_bounds) THEN (SELECT lower_b FROM yearbirth_bounds)
+    WHEN Year_Birth > (SELECT upper_b FROM yearbirth_bounds) THEN (SELECT upper_b FROM yearbirth_bounds)
+    ELSE Year_Birth END
+-- Đã thực thi (rowcount=2239) --
+
+-- SQL --
+CREATE TEMP TABLE recency_bounds AS
+WITH ranked AS (
+    SELECT Recency, ROW_NUMBER() OVER (ORDER BY Recency) AS rn, COUNT(*) OVER () AS cnt
+    FROM customers_work
+),
+q AS (
+    SELECT
+        (SELECT Recency FROM ranked WHERE rn = CAST(cnt * 0.25 AS INTEGER) + 1) AS q1,
+        (SELECT Recency FROM ranked WHERE rn = CAST(cnt * 0.75 AS INTEGER) + 1) AS q3
+    FROM ranked LIMIT 1
+)
+SELECT q1, q3, (q3 - q1) AS iqr, q1 - 1.5 * (q3 - q1) AS lower_b, q3 + 1.5 * (q3 - q1) AS upper_b FROM q
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+SELECT 'Recency' AS field, * FROM recency_bounds
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+  field   q1   q3  iqr  lower_b  upper_b
+Recency 24.0 74.0 50.0    -51.0    149.0
+
+-- SQL --
+SELECT COUNT(*) AS recency_so_outlier
+FROM customers_work, recency_bounds
+WHERE customers_work.Recency < recency_bounds.lower_b OR customers_work.Recency > recency_bounds.upper_b
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ recency_so_outlier
+                  1
+
+-- SQL --
+UPDATE customers_work
+SET Recency = CASE
+    WHEN Recency < (SELECT lower_b FROM recency_bounds) THEN (SELECT lower_b FROM recency_bounds)
+    WHEN Recency > (SELECT upper_b FROM recency_bounds) THEN (SELECT upper_b FROM recency_bounds)
+    ELSE Recency END
+-- Đã thực thi (rowcount=2239) --
+
+-- SQL --
+SELECT MIN(Income) AS income_min_sau, MAX(Income) AS income_max_sau,
+       MIN(Year_Birth) AS yearbirth_min_sau, MAX(Recency) AS recency_max_sau
+FROM customers_work
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ income_min_sau  income_max_sau  yearbirth_min_sau  recency_max_sau
+            0.0        116698.0             1932.0            149.0
+
+-- SQL --
+UPDATE customers_work SET Education = 'PhD' WHERE LOWER(Education) = 'phd'
+-- Đã thực thi (rowcount=478) --
+
+-- SQL --
+UPDATE customers_work SET Education = 'Graduation' WHERE LOWER(Education) = 'graduation'
+-- Đã thực thi (rowcount=1141) --
+
+-- SQL --
+UPDATE customers_work SET Education = 'Master' WHERE LOWER(Education) = 'master'
+-- Đã thực thi (rowcount=364) --
+
+-- SQL --
+UPDATE customers_work SET Education = '2n Cycle' WHERE LOWER(Education) = '2n cycle'
+-- Đã thực thi (rowcount=202) --
+
+-- SQL --
+UPDATE customers_work SET Education = 'Basic' WHERE LOWER(Education) = 'basic'
+-- Đã thực thi (rowcount=54) --
+
+-- SQL --
+UPDATE customers_work SET Marital_Status = 'Single' WHERE LOWER(Marital_Status) = 'single'
+-- Đã thực thi (rowcount=474) --
+
+-- SQL --
+UPDATE customers_work SET Marital_Status = 'Married' WHERE LOWER(Marital_Status) = 'married'
+-- Đã thực thi (rowcount=884) --
+
+-- SQL --
+UPDATE customers_work SET Marital_Status = 'Together' WHERE LOWER(Marital_Status) = 'together'
+-- Đã thực thi (rowcount=571) --
+
+-- SQL --
+UPDATE customers_work SET Marital_Status = 'Divorced' WHERE LOWER(Marital_Status) = 'divorced'
+-- Đã thực thi (rowcount=228) --
+
+-- SQL --
+UPDATE customers_work SET Marital_Status = 'Widow' WHERE LOWER(Marital_Status) = 'widow'
+-- Đã thực thi (rowcount=75) --
+
+-- SQL --
+SELECT DISTINCT Education FROM customers_work ORDER BY Education
+-- KẾT QUẢ (5 dòng, hiển thị tối đa 20) --
+ Education
+  2n Cycle
+     Basic
+Graduation
+    Master
+       PhD
+
+-- SQL --
+SELECT DISTINCT Marital_Status FROM customers_work ORDER BY Marital_Status
+-- KẾT QUẢ (8 dòng, hiển thị tối đa 20) --
+Marital_Status
+        Absurd
+         Alone
+      Divorced
+       Married
+        Single
+      Together
+         Widow
+          YOLO
+
+-- SQL --
+CREATE TEMP TABLE date_demo_backup AS
+SELECT rowid AS rid, Dt_Customer AS original_value
+FROM customers_work ORDER BY rowid LIMIT 5
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+SELECT * FROM date_demo_backup
+-- KẾT QUẢ (5 dòng, hiển thị tối đa 20) --
+ rid original_value
+   1     2012-09-04
+   2     2014-03-08
+   4     2014-02-10
+   5     2014-01-19
+   6     2013-09-09
+
+-- SQL --
+UPDATE customers_work
+SET Dt_Customer = substr(Dt_Customer, 9, 2) || '/' || substr(Dt_Customer, 6, 2) || '/' || substr(Dt_Customer, 1, 4)
+WHERE rowid IN (SELECT rid FROM date_demo_backup)
+-- Đã thực thi (rowcount=5) --
+
+-- SQL --
+SELECT rowid, Dt_Customer FROM customers_work WHERE rowid IN (SELECT rid FROM date_demo_backup)
+-- KẾT QUẢ (5 dòng, hiển thị tối đa 20) --
+ rowid Dt_Customer
+     1  04/09/2012
+     2  08/03/2014
+     4  10/02/2014
+     5  19/01/2014
+     6  09/09/2013
+
+-- SQL --
+UPDATE customers_work
+SET Dt_Customer = substr(Dt_Customer, 7, 4) || '-' || substr(Dt_Customer, 4, 2) || '-' || substr(Dt_Customer, 1, 2)
+WHERE Dt_Customer LIKE '__/__/____'
+-- Đã thực thi (rowcount=5) --
+
+-- SQL --
+SELECT b.rid, b.original_value, w.Dt_Customer AS value_after_fix,
+       (b.original_value = w.Dt_Customer) AS khop_voi_ban_goc
+FROM date_demo_backup b JOIN customers_work w ON b.rid = w.rowid
+-- KẾT QUẢ (5 dòng, hiển thị tối đa 20) --
+ rid original_value value_after_fix  khop_voi_ban_goc
+   1     2012-09-04      2012-09-04                 1
+   2     2014-03-08      2014-03-08                 1
+   4     2014-02-10      2014-02-10                 1
+   5     2014-01-19      2014-01-19                 1
+   6     2013-09-09      2013-09-09                 1
+
+-- SQL --
+CREATE TEMP TABLE marital_demo_backup AS
+SELECT rowid AS rid, Marital_Status AS original_value
+FROM customers_work ORDER BY rowid LIMIT 5 OFFSET 5
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+SELECT * FROM marital_demo_backup
+-- KẾT QUẢ (5 dòng, hiển thị tối đa 20) --
+ rid original_value
+   7       Divorced
+   8        Married
+   9         Single
+  10       Together
+  11        Married
+
+-- SQL --
+UPDATE customers_work
+SET Marital_Status = UPPER(Marital_Status)
+WHERE rowid IN (SELECT rid FROM marital_demo_backup)
+-- Đã thực thi (rowcount=5) --
+
+-- SQL --
+SELECT rowid, Marital_Status FROM customers_work WHERE rowid IN (SELECT rid FROM marital_demo_backup)
+-- KẾT QUẢ (5 dòng, hiển thị tối đa 20) --
+ rowid Marital_Status
+     7       DIVORCED
+     8        MARRIED
+     9         SINGLE
+    10       TOGETHER
+    11        MARRIED
+
+-- SQL --
+UPDATE customers_work
+SET Marital_Status = UPPER(SUBSTR(Marital_Status, 1, 1)) || LOWER(SUBSTR(Marital_Status, 2))
+WHERE rowid IN (SELECT rid FROM marital_demo_backup)
+-- Đã thực thi (rowcount=5) --
+
+-- SQL --
+SELECT b.rid, b.original_value, w.Marital_Status AS value_after_fix,
+       (b.original_value = w.Marital_Status) AS khop_voi_ban_goc
+FROM marital_demo_backup b JOIN customers_work w ON b.rid = w.rowid
+-- KẾT QUẢ (5 dòng, hiển thị tối đa 20) --
+ rid original_value value_after_fix  khop_voi_ban_goc
+   7       Divorced        Divorced                 1
+   8        Married         Married                 1
+   9         Single          Single                 1
+  10       Together        Together                 1
+  11        Married         Married                 1
+
+-- SQL --
+SELECT COUNT(*) AS so_dong_cuoi_cung_sau_cleaning FROM customers_work
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ so_dong_cuoi_cung_sau_cleaning
+                           2239
+
+======================================================================
+>>> ĐANG CHẠY: 03_transformation.sql
+======================================================================
+
+-- SQL --
+SELECT COUNT(DISTINCT Z_CostContact) AS so_gia_tri_duy_nhat_Z_CostContact,
+       COUNT(DISTINCT Z_Revenue) AS so_gia_tri_duy_nhat_Z_Revenue
+FROM customers_work
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ so_gia_tri_duy_nhat_Z_CostContact  so_gia_tri_duy_nhat_Z_Revenue
+                                 1                              1
+
+-- SQL --
+ALTER TABLE customers_work DROP COLUMN Z_CostContact
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+ALTER TABLE customers_work DROP COLUMN Z_Revenue
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+DROP TABLE IF EXISTS customers_sample_demo
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+CREATE TABLE customers_sample_demo AS
+SELECT * FROM (
+    SELECT *,
+           ROW_NUMBER() OVER (PARTITION BY Education ORDER BY RANDOM()) AS rn_,
+           COUNT(*) OVER (PARTITION BY Education) AS grp_cnt_
+    FROM customers_work
+)
+WHERE rn_ <= CAST(grp_cnt_ * 0.2 AS INTEGER)
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+SELECT (SELECT COUNT(*) FROM customers_work) AS so_dong_goc,
+       (SELECT COUNT(*) FROM customers_sample_demo) AS so_dong_mau_20_phan_tram
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ so_dong_goc  so_dong_mau_20_phan_tram
+        2239                       445
+
+-- SQL --
+ALTER TABLE customers_work ADD COLUMN Education_encoded INTEGER
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+UPDATE customers_work SET Education_encoded = CASE Education
+    WHEN 'Basic' THEN 0 WHEN '2n Cycle' THEN 1 WHEN 'Graduation' THEN 2
+    WHEN 'Master' THEN 3 WHEN 'PhD' THEN 4 END
+-- Đã thực thi (rowcount=2239) --
+
+-- SQL --
+SELECT DISTINCT Education, Education_encoded FROM customers_work ORDER BY Education_encoded
+-- KẾT QUẢ (5 dòng, hiển thị tối đa 20) --
+ Education  Education_encoded
+     Basic                  0
+  2n Cycle                  1
+Graduation                  2
+    Master                  3
+       PhD                  4
+
+-- SQL --
+ALTER TABLE customers_work ADD COLUMN Marital_Status_encoded INTEGER
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+UPDATE customers_work SET Marital_Status_encoded = CASE Marital_Status
+    WHEN 'Absurd' THEN 0 WHEN 'Alone' THEN 1 WHEN 'Divorced' THEN 2 WHEN 'Married' THEN 3
+    WHEN 'Single' THEN 4 WHEN 'Together' THEN 5 WHEN 'Widow' THEN 6 WHEN 'YOLO' THEN 7 END
+-- Đã thực thi (rowcount=2239) --
+
+-- SQL --
+SELECT DISTINCT Marital_Status, Marital_Status_encoded FROM customers_work ORDER BY Marital_Status_encoded
+-- KẾT QUẢ (8 dòng, hiển thị tối đa 20) --
+Marital_Status  Marital_Status_encoded
+        Absurd                       0
+         Alone                       1
+      Divorced                       2
+       Married                       3
+        Single                       4
+      Together                       5
+         Widow                       6
+          YOLO                       7
+
+-- SQL --
+ALTER TABLE customers_work ADD COLUMN Campaigns_Response_Bitmask INTEGER
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+UPDATE customers_work
+SET Campaigns_Response_Bitmask =
+    CAST(AcceptedCmp3 AS INTEGER) * 1 + CAST(AcceptedCmp4 AS INTEGER) * 2 +
+    CAST(AcceptedCmp5 AS INTEGER) * 4 + CAST(AcceptedCmp1 AS INTEGER) * 8 +
+    CAST(AcceptedCmp2 AS INTEGER) * 16 + CAST(Complain AS INTEGER) * 32 +
+    CAST(Response AS INTEGER) * 64
+-- Đã thực thi (rowcount=2239) --
+
+-- SQL --
+SELECT AcceptedCmp3, AcceptedCmp4, AcceptedCmp5, AcceptedCmp1, AcceptedCmp2, Complain, Response,
+       Campaigns_Response_Bitmask
+FROM customers_work LIMIT 8
+-- KẾT QUẢ (8 dòng, hiển thị tối đa 20) --
+ AcceptedCmp3  AcceptedCmp4  AcceptedCmp5  AcceptedCmp1  AcceptedCmp2  Complain  Response  Campaigns_Response_Bitmask
+          0.0           0.0           0.0           0.0           0.0       0.0       1.0                          64
+          0.0           0.0           0.0           0.0           0.0       0.0       0.0                           0
+          0.0           0.0           0.0           0.0           0.0       0.0       0.0                           0
+          0.0           0.0           0.0           0.0           0.0       0.0       0.0                           0
+          0.0           0.0           0.0           0.0           0.0       0.0       0.0                           0
+          0.0           0.0           0.0           0.0           0.0       0.0       0.0                           0
+          0.0           0.0           0.0           0.0           0.0       0.0       0.0                           0
+          0.0           0.0           0.0           0.0           0.0       0.0       1.0                          64
+
+-- SQL --
+ALTER TABLE customers_work ADD COLUMN Products_Purchased TEXT
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+UPDATE customers_work
+SET Products_Purchased = RTRIM(
+    (CASE WHEN MntWines > 0 THEN 'Wines, ' ELSE '' END) ||
+    (CASE WHEN MntFruits > 0 THEN 'Fruits, ' ELSE '' END) ||
+    (CASE WHEN MntMeatProducts > 0 THEN 'Meat, ' ELSE '' END) ||
+    (CASE WHEN MntFishProducts > 0 THEN 'Fish, ' ELSE '' END) ||
+    (CASE WHEN MntSweetProducts > 0 THEN 'Sweet, ' ELSE '' END) ||
+    (CASE WHEN MntGoldProds > 0 THEN 'Gold, ' ELSE '' END),
+    ', '
+)
+-- Đã thực thi (rowcount=2239) --
+
+-- SQL --
+SELECT ID, Products_Purchased FROM customers_work LIMIT 8
+-- KẾT QUẢ (8 dòng, hiển thị tối đa 20) --
+    ID                     Products_Purchased
+5524.0 Wines, Fruits, Meat, Fish, Sweet, Gold
+2174.0 Wines, Fruits, Meat, Fish, Sweet, Gold
+6182.0 Wines, Fruits, Meat, Fish, Sweet, Gold
+5324.0 Wines, Fruits, Meat, Fish, Sweet, Gold
+7446.0       Wines, Fruits, Meat, Sweet, Gold
+ 965.0 Wines, Fruits, Meat, Fish, Sweet, Gold
+6177.0 Wines, Fruits, Meat, Fish, Sweet, Gold
+4855.0         Wines, Meat, Fish, Sweet, Gold
+
+-- SQL --
+ALTER TABLE customers_work ADD COLUMN Product_Categories_Bitmask INTEGER
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+UPDATE customers_work
+SET Product_Categories_Bitmask =
+    (CASE WHEN MntWines > 0 THEN 1 ELSE 0 END) + (CASE WHEN MntFruits > 0 THEN 2 ELSE 0 END) +
+    (CASE WHEN MntMeatProducts > 0 THEN 4 ELSE 0 END) + (CASE WHEN MntFishProducts > 0 THEN 8 ELSE 0 END) +
+    (CASE WHEN MntSweetProducts > 0 THEN 16 ELSE 0 END) + (CASE WHEN MntGoldProds > 0 THEN 32 ELSE 0 END)
+-- Đã thực thi (rowcount=2239) --
+
+-- SQL --
+SELECT ID, Products_Purchased, Product_Categories_Bitmask FROM customers_work LIMIT 8
+-- KẾT QUẢ (8 dòng, hiển thị tối đa 20) --
+    ID                     Products_Purchased  Product_Categories_Bitmask
+5524.0 Wines, Fruits, Meat, Fish, Sweet, Gold                          63
+2174.0 Wines, Fruits, Meat, Fish, Sweet, Gold                          63
+6182.0 Wines, Fruits, Meat, Fish, Sweet, Gold                          63
+5324.0 Wines, Fruits, Meat, Fish, Sweet, Gold                          63
+7446.0       Wines, Fruits, Meat, Sweet, Gold                          55
+ 965.0 Wines, Fruits, Meat, Fish, Sweet, Gold                          63
+6177.0 Wines, Fruits, Meat, Fish, Sweet, Gold                          63
+4855.0         Wines, Meat, Fish, Sweet, Gold                          61
+
+-- SQL --
+DROP TABLE IF EXISTS customers_after
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+CREATE TABLE customers_after AS SELECT * FROM customers_work
+-- Đã thực thi (rowcount=-1) --
+
+-- SQL --
+SELECT COUNT(*) AS so_dong_cuoi_cung, COUNT(*) AS so_cot_kiem_tra FROM customers_after
+-- KẾT QUẢ (1 dòng, hiển thị tối đa 20) --
+ so_dong_cuoi_cung  so_cot_kiem_tra
+              2239             2239
+
+>>> Đã xuất kết quả cuối cùng ra: /Users/nguyenquochung/Desktop/Năm 4/HK1/Phương pháp phân tích dữ liệu cơ bản/BCCCM/NguyenQuocHung_2311110060/DATA/after_sql.csv (2239 dòng x 33 cột)
